@@ -18,7 +18,7 @@ app.use(express.static("public"));
 
 // 🔗 MongoDB (replace this)
 
-mongoose.connect("YOUR_MONGO_URL");
+mongoose.connect("mongodb+srv://admin:Admin%401234@dbuser.qsmfb1q.mongodb.net/?appName=dbuser");
 
 // Schema
 
