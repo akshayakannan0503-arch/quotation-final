@@ -1,14 +1,108 @@
 <!DOCTYPE html>
 <html>
+<head>
+<meta charset="UTF-8">
+<title>Quotation</title>
+<style>
+
+  body {
+
+    font-family: "Times New Roman", serif;
+
+    margin: 30px;
+
+    font-size: 14px;
+
+  }
+
+  .header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    border-bottom: 2px solid black;
+
+    padding-bottom: 10px;
+
+  }
+
+  .company {
+
+    color: purple;
+
+    font-size: 26px;
+
+    font-weight: bold;
+
+  }
+
+  .right {
+
+    text-align: right;
+
+    font-size: 12px;
+
+    line-height: 18px;
+
+  }
+
+  .section {
+
+    margin-top: 20px;
+
+  }
+
+  .label {
+
+    font-weight: bold;
+
+  }
+
+  textarea {
+
+    width: 100%;
+
+    border: none;
+
+    outline: none;
+
+    font-family: inherit;
+
+    font-size: 14px;
+
+    resize: none;
+
+  }
+</style>
+</head>
 <body>
-<h2>Quotation</h2>
-<input id="client" placeholder="Client"><br>
-<input id="addr" placeholder="Address"><br>
-<input id="house" placeholder="Housekeeping"><br>
-<input id="sup" placeholder="Supervisor"><br>
-<button onclick="calc()">Calculate</button>
-<button onclick="save()">Save</button>
-<button onclick="pdf()">Download PDF</button>
-<script src="script.js"></script>
+<!-- HEADER (STATIC - DO NOT CHANGE) -->
+<div class="header">
+<div>
+<div class="company">VIGNU ENTERPRISES</div>
+<div>GST NO: 33BCKPV5857M2ZP</div>
+</div>
+<div class="right">
+
+    📞 8056132137<br>
+
+    ✉ vignuenterprises@gmail.com<br>
+
+    32B Natesan Nagar, Madhavaram,<br>
+
+    Chennai - 600060
+</div>
+</div>
+<!-- TO SECTION (EDITABLE) -->
+<div class="section">
+<div class="label">To,</div>
+<textarea id="toSection" rows="4" placeholder="Enter client name and address"></textarea>
+</div>
+<!-- SIR SECTION (EDITABLE) -->
+<div class="section">
+<div class="label">Sir,</div>
+<textarea id="sirSection" rows="4" placeholder="Enter subject / message"></textarea>
+</div>
 </body>
 </html>
