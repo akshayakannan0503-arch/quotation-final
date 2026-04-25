@@ -8,6 +8,8 @@ const cors = require("cors");
 
 const puppeteer = require("puppeteer");
 
+require("dotenv").config();
+
 const app = express();
 
 app.use(cors());
@@ -16,11 +18,13 @@ app.use(bodyParser.json());
 
 app.use(express.static("public"));
 
-// 🔗 MongoDB (replace this)
+// ================= DB CONNECTION =================
 
-mongoose.connect("mongodb+srv://admin:Admin%401234@dbuser.qsmfb1q.mongodb.net/?appName=dbuser");
+mongoose.connect(process.env.MONGO_URL)
 
-// Schema
+.then(() => console.log("MongoDB Connected"))
+
+// ================= SCHEMA =================
 
 const Quote = mongoose.model("Quote", new mongoose.Schema({
 
@@ -42,106 +46,119 @@ const Quote = mongoose.model("Quote", new mongoose.Schema({
 
 }));
 
+// ================= SAVE API =================
+
 app.post("/save", async (req, res) => {
 
-  await new Quote(req.body).save();
+  try {
 
-  res.send("Saved");
+    await new Quote(req.body).save();
+
+    res.send("Saved");
+
+  } catch (err) {
+
+  }
 
 });
 
-// 📄 PDF
+// ================= PDF API =================
 
 app.post("/pdf", async (req, res) => {
 
-  const d = req.body;
+  try {
 
-  const browser = await puppeteer.launch();
+    const d = req.body;
 
-  const page = await browser.newPage();
+    const browser = await puppeteer.launch({
 
-  const html = `
+      args: ["--no-sandbox", "--disable-setuid-sandbox"] //
+
+    });
+
+    const page = await browser.newPage();
+
+    const html = `
 <html>
 <head>
 <style>
 
-    body { font-family: Arial; padding: 20px; }
+      body { font-family: Arial; padding: 20px; }
 
-    .header {
+      .header {
 
-      display: flex;
+        display: flex;
 
-      justify-content: space-between;
+        justify-content: space-between;
 
-      align-items: center;
+        align-items: center;
 
-    }
+      }
 
-    .logo {
+      .logo {
 
-      font-size: 26px;
+        font-size: 26px;
 
-      font-weight: bold;
+        font-weight: bold;
 
-      color: #7a2cff;
+        color: #7a2cff;
 
-    }
+      }
 
-    .right {
+      .right {
 
-      text-align: right;
+        text-align: right;
 
-      font-size: 12px;
+        font-size: 12px;
 
-    }
+      }
 
-    .box {
+      .box {
 
-      border: 1px solid black;
+        border: 1px solid black;
 
-      margin-top: 10px;
+        margin-top: 10px;
 
-      padding: 10px;
+        padding: 10px;
 
-    }
+      }
 
-    table {
+      table {
 
-      width: 100%;
+        width: 100%;
 
-      border-collapse: collapse;
+        border-collapse: collapse;
 
-      margin-top: 10px;
+        margin-top: 10px;
 
-    }
+      }
 
-    th, td {
+      th, td {
 
-      border: 1px solid black;
+        border: 1px solid black;
 
-      padding: 6px;
+        padding: 6px;
 
-    }
+      }
 
-    th {
+      th {
 
-      background: #f0f0f0;
+        background: #f0f0f0;
 
-    }
+      }
 
-    .red {
+      .red {
 
-      color: red;
+        color: red;
 
-      font-weight: bold;
+        font-weight: bold;
 
-    }
+      }
 
-    h4 { margin-top: 15px; }
+      h4 { margin-top: 15px; }
 </style>
 </head>
 <body>
-<!-- HEADER -->
 <div class="header">
 <div>
 <div class="logo">VIGNU ENTERPRISES</div>
@@ -153,14 +170,12 @@ app.post("/pdf", async (req, res) => {
 <div>32B Natesan Nagar, Madhavaram, Chennai</div>
 </div>
 </div>
-<!-- CLIENT -->
 <div class="box">
 <b>To:</b> ${d.clientName}<br>
 
-    ${d.address}<br>
+      ${d.address}<br>
 <b>Date:</b> ${d.date}
 </div>
-<!-- MAIN TABLE -->
 <table>
 <tr><th>Description</th><th>Amount (INR)</th></tr>
 <tr><td>Monthly Housekeeping Charges</td><td>${d.housekeeping}</td></tr>
@@ -169,13 +184,11 @@ app.post("/pdf", async (req, res) => {
 <tr><td>GST 18%</td><td>${d.gst}</td></tr>
 <tr class="red"><td>Grand Total</td><td>${d.grandTotal}</td></tr>
 </table>
-<!-- MANPOWER -->
 <h4>Manpower Deployment</h4>
 <ul>
 <li>Housekeeping Staff: 6</li>
 <li>Supervisor: 1</li>
 </ul>
-<!-- SCOPE -->
 <h4>Scope of Services</h4>
 <ul>
 <li>Cleaning of floors, workspace</li>
@@ -183,7 +196,6 @@ app.post("/pdf", async (req, res) => {
 <li>Garbage disposal</li>
 <li>Pantry maintenance</li>
 </ul>
-<!-- STAFF COST -->
 <h4>Total Cost Calculation</h4>
 <table>
 <tr><th>Component</th><th>Amount</th></tr>
@@ -193,7 +205,6 @@ app.post("/pdf", async (req, res) => {
 <tr><td>Bonus</td><td>1240</td></tr>
 <tr><td>Total</td><td>19103.75</td></tr>
 </table>
-<!-- SUPERVISOR -->
 <h4>Supervisor Cost Calculation</h4>
 <table>
 <tr><th>Component</th><th>Amount</th></tr>
@@ -203,7 +214,6 @@ app.post("/pdf", async (req, res) => {
 <tr><td>Bonus</td><td>1440</td></tr>
 <tr><td>Total</td><td>22185</td></tr>
 </table>
-<!-- TERMS -->
 <h4>Terms & Conditions</h4>
 <ul>
 <li>12 months contract</li>
@@ -214,18 +224,41 @@ app.post("/pdf", async (req, res) => {
 </body>
 </html>
 
-  `;
+    `;
 
-  await page.setContent(html);
+    await page.setContent(html, { waitUntil: "domcontentloaded" });
 
-  const pdf = await page.pdf({ format: "A4", printBackground: true });
+    const pdf = await page.pdf({
 
-  await browser.close();
+      format: "A4",
 
-  res.set({ "Content-Type": "application/pdf" });
+      printBackground: true
 
-  res.send(pdf);
+    });
+
+    await browser.close();
+
+    res.set({
+
+      "Content-Type": "application/pdf",
+
+      "Content-Disposition": "inline; filename=quotation.pdf"
+
+    });
+
+    res.send(pdf);
+
+  } catch (err) {
+
+    console.log(err);
+
+  }
 
 });
 
-app.listen(3000, () => console.log("Server running"));
+// ================= SERVER =================
+
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => console.log("🚀 Server running on port " + PORT));
+ 
